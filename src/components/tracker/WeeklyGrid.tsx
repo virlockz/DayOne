@@ -14,13 +14,13 @@ interface WeeklyGridProps {
 
 export function WeeklyGrid({ habits, isCompleted, toggleLog }: WeeklyGridProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(() => 
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), { weekStartsOn: 0 })
   );
   const today = new Date();
 
   const days = useMemo(() => {
     const start = currentWeekStart;
-    const end = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
+    const end = endOfWeek(currentWeekStart, { weekStartsOn: 0 });
     return eachDayOfInterval({ start, end });
   }, [currentWeekStart]);
 
@@ -29,11 +29,11 @@ export function WeeklyGrid({ habits, isCompleted, toggleLog }: WeeklyGridProps) 
 
   const goToPrevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
   const goToNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
-  const goToThisWeek = () => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const goToThisWeek = () => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 0 }));
 
   if (habits.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="flex flex-col items-center justify-center py-16 text-center px-4">
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
           <span className="text-2xl">📝</span>
         </div>
@@ -46,95 +46,97 @@ export function WeeklyGrid({ habits, isCompleted, toggleLog }: WeeklyGridProps) 
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-4 md:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 px-1">
-        <div>
-          <h2 className="text-xl md:text-2xl font-display font-semibold text-foreground">
-            WEEK {weekNumber}
-          </h2>
-          <p className="text-sm text-muted-foreground">{dateRange}</p>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-center gap-4 mb-8">
+        <div className="flex items-center justify-center gap-4">
           <Button variant="ghost" size="icon" onClick={goToPrevWeek}>
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <Button variant="outline" size="sm" onClick={goToThisWeek}>
-            This Week
-          </Button>
+          <div className="text-center min-w-[200px]">
+            <h2 className="text-2xl md:text-3xl font-display font-semibold text-foreground tracking-wide">
+              WEEK {weekNumber}
+            </h2>
+            <p className="text-sm text-muted-foreground">{dateRange}</p>
+          </div>
           <Button variant="ghost" size="icon" onClick={goToNextWeek}>
             <ChevronRight className="w-5 h-5" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={goToThisWeek} className="ml-2">
+            This Week
           </Button>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="flex-1">
-        {/* Day Headers */}
-        <div className="grid grid-cols-8 gap-2 mb-4">
-          <div className="col-span-1" /> {/* Habit name spacer */}
-          {days.map((day) => {
-            const isToday = isSameDay(day, today);
-            return (
-              <div
-                key={day.toISOString()}
-                className={cn(
-                  'text-center py-2 rounded-lg',
-                  isToday && 'bg-primary/10'
-                )}
-              >
-                <div className={cn(
-                  'text-xs font-medium uppercase',
-                  isToday ? 'text-primary' : 'text-muted-foreground'
-                )}>
-                  {format(day, 'EEE')}
-                </div>
-                <div className={cn(
-                  'text-lg font-semibold',
-                  isToday ? 'text-primary' : 'text-foreground'
-                )}>
-                  {format(day, 'd')}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Habit Rows */}
-        {habits.map((habit) => (
-          <div key={habit.id} className="grid grid-cols-8 gap-2 mb-3 items-center">
-            {/* Habit Name */}
-            <div className="col-span-1 pr-2">
-              <span className="text-sm font-medium text-foreground truncate block">
-                {habit.name}
-              </span>
-            </div>
-
-            {/* Day Cells */}
+      <div className="flex-1 overflow-x-auto">
+        <div className="min-w-max">
+          {/* Day Headers */}
+          <div className="flex mb-4">
+            <div className="min-w-[140px] md:min-w-[180px] shrink-0" />
             {days.map((day) => {
-              const dateStr = format(day, 'yyyy-MM-dd');
               const isToday = isSameDay(day, today);
-              const completed = isCompleted(habit.id, dateStr);
-
               return (
-                <div 
-                  key={dateStr} 
+                <div
+                  key={day.toISOString()}
                   className={cn(
-                    'flex justify-center p-1 rounded-lg',
-                    isToday && 'bg-primary/5'
+                    'flex-1 min-w-[60px] text-center py-3 mx-1 rounded-xl transition-colors',
+                    isToday && 'bg-primary/10'
                   )}
                 >
-                  <HabitCell
-                    completed={completed}
-                    isToday={isToday}
-                    onClick={() => toggleLog(habit.id, dateStr)}
-                    size="lg"
-                  />
+                  <div className={cn(
+                    'text-xs font-medium uppercase tracking-wide',
+                    isToday ? 'text-primary' : 'text-muted-foreground'
+                  )}>
+                    {format(day, 'EEE')}
+                  </div>
+                  <div className={cn(
+                    'text-xl font-semibold mt-1',
+                    isToday ? 'text-primary' : 'text-foreground'
+                  )}>
+                    {format(day, 'd')}
+                  </div>
                 </div>
               );
             })}
           </div>
-        ))}
+
+          {/* Habit Rows */}
+          {habits.map((habit) => (
+            <div key={habit.id} className="flex items-center mb-3">
+              {/* Habit Name */}
+              <div className="min-w-[140px] md:min-w-[180px] shrink-0 pr-4">
+                <span className="text-sm font-medium text-foreground truncate block">
+                  {habit.name}
+                </span>
+              </div>
+
+              {/* Day Cells */}
+              {days.map((day) => {
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const isToday = isSameDay(day, today);
+                const completed = isCompleted(habit.id, dateStr);
+
+                return (
+                  <div 
+                    key={dateStr} 
+                    className={cn(
+                      'flex-1 min-w-[60px] flex justify-center py-2 mx-1 rounded-xl transition-colors',
+                      isToday && 'bg-primary/5'
+                    )}
+                  >
+                    <HabitCell
+                      completed={completed}
+                      isToday={isToday}
+                      onClick={() => toggleLog(habit.id, dateStr)}
+                      size="lg"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
