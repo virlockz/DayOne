@@ -201,7 +201,7 @@ export function HabitFormModal({
 
           {/* Category */}
           <div className="space-y-2">
-            <Label>Habit Area</Label>
+            <Label>Habit Area <span className="text-muted-foreground">*</span></Label>
             <Select value={category} onValueChange={(v) => setCategory(v as HabitCategory)}>
               <SelectTrigger>
                 <SelectValue />
