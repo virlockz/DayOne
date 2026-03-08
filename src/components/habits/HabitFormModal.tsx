@@ -187,7 +187,7 @@ export function HabitFormModal({
           <div className="space-y-2 p-4 rounded-lg bg-secondary/50 border border-border">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
               <MapPin className="w-4 h-4 text-primary" />
-              Context Cue <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+              Context Cue
             </div>
             <p className="text-xs text-muted-foreground">
               Where and when will you perform this habit?
