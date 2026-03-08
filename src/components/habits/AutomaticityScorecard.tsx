@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Brain, HelpCircle } from 'lucide-react';
+import { Brain, HelpCircle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -79,6 +79,7 @@ export function AutomaticityScorecard({
     }}>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
+          <BookOpen className="w-4 h-4" />
           Weekly Reflection
         </Button>
       </DialogTrigger>
