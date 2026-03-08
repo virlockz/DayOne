@@ -235,7 +235,7 @@ export function HabitFormModal({
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />
-              <Label>Schedule</Label>
+              <Label>Schedule <span className="text-muted-foreground">*</span></Label>
             </div>
             
             <Select value={scheduleType} onValueChange={(v) => setScheduleType(v as HabitSchedule['type'])}>
