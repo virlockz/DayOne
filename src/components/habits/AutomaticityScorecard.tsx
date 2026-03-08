@@ -79,7 +79,6 @@ export function AutomaticityScorecard({
     }}>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <Brain className="w-4 h-4" />
           Weekly Reflection
         </Button>
       </DialogTrigger>
