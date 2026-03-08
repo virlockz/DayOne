@@ -53,6 +53,7 @@ export default function EnhancedSettingsPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-3xl mx-auto">
+      <span className="font-display font-semibold text-foreground text-lg">Settings</span>
     </div>
   );
 }
