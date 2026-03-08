@@ -53,7 +53,7 @@ export default function EnhancedSettingsPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-3xl mx-auto">
-      <span className="font-display font-semibold text-foreground text-[2.8rem]">Settings</span>
+      <h1 className="font-display font-semibold text-foreground text-2xl md:text-3xl">Settings</h1>
     </div>
   );
 }
