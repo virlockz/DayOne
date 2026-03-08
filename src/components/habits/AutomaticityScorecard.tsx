@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Brain, HelpCircle } from 'lucide-react';
+import { Brain, HelpCircle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
