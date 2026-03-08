@@ -171,7 +171,7 @@ export function HabitFormModal({
           <div className="space-y-2 p-4 rounded-lg bg-secondary/50 border border-border">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
               <Clock className="w-4 h-4 text-primary" />
-              2-Minute Entry Action <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+              2-Minute Entry Action
             </div>
             <p className="text-xs text-muted-foreground">
               What's the smallest version you can start with?
