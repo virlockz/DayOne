@@ -124,7 +124,7 @@ export function HabitFormModal({
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           {/* Basic Info */}
           <div className="space-y-2">
-            <Label htmlFor="name">Habit Name</Label>
+            <Label htmlFor="name">Habit Name <span className="text-muted-foreground">*</span></Label>
             <Input
               id="name"
               value={name}
