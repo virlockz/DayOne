@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Plus, X, Sparkles, Clock, MapPin, Link2, Calendar } from 'lucide-react';
+import { Plus, Sparkles, CheckCircle2, Pencil, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -12,17 +11,22 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Habit, HabitCategory, HabitSchedule, PRESET_CATEGORIES, CustomCategory } from '@/types/habits';
 import { cn } from '@/lib/utils';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const HABIT_COLORS = [
+  '#10b981', '#059669', '#84cc16', '#eab308', '#f59e0b',
+  '#f97316', '#ef4444', '#ec4899', '#a855f7', '#8b5cf6',
+  '#6366f1', '#3b82f6', '#06b6d4',
+];
+
+type RepeatOption = 'daily' | 'weekdays' | 'weekends' | 'pick-days' | 'x-per-week';
 
 interface HabitFormModalProps {
   onSubmit: (habit: Omit<Habit, 'id' | 'createdAt'>) => void;
@@ -40,48 +44,75 @@ export function HabitFormModal({
   mode = 'create',
 }: HabitFormModalProps) {
   const [open, setOpen] = useState(false);
-  
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+
   // Form state
   const [name, setName] = useState(initialData?.name || '');
+  const [color, setColor] = useState(initialData?.color || HABIT_COLORS[0]);
+  const [repeatOption, setRepeatOption] = useState<RepeatOption>(() => {
+    if (!initialData?.schedule) return 'daily';
+    if (initialData.schedule.type === 'daily') return 'daily';
+    if (initialData.schedule.type === 'monthly') return 'x-per-week';
+    if (initialData.schedule.type === 'weekly') {
+      const days = initialData.schedule.targetDays || [];
+      if (JSON.stringify(days.sort()) === JSON.stringify([1, 2, 3, 4, 5])) return 'weekdays';
+      if (JSON.stringify(days.sort()) === JSON.stringify([0, 6])) return 'weekends';
+      return 'pick-days';
+    }
+    return 'daily';
+  });
+  const [targetDays, setTargetDays] = useState<number[]>(
+    initialData?.schedule?.targetDays || [1, 2, 3, 4, 5]
+  );
+  const [weeklyTarget, setWeeklyTarget] = useState(
+    initialData?.schedule?.targetCount || 3
+  );
+
+  // Customize fields
   const [stackingCue, setStackingCue] = useState(initialData?.stackingCue || '');
   const [stackingAction, setStackingAction] = useState(initialData?.stackingAction || '');
   const [twoMinuteAction, setTwoMinuteAction] = useState(initialData?.twoMinuteAction || '');
   const [contextCue, setContextCue] = useState(initialData?.contextCue || '');
   const [category, setCategory] = useState<HabitCategory>(initialData?.category || 'productivity');
-  const [customCategoryId, setCustomCategoryId] = useState(initialData?.customCategoryName || '');
-  const [scheduleType, setScheduleType] = useState<HabitSchedule['type']>(
-    initialData?.schedule?.type || 'daily'
-  );
-  const [targetDays, setTargetDays] = useState<number[]>(
-    initialData?.schedule?.targetDays || [1, 2, 3, 4, 5] // Mon-Fri default
-  );
-  const [monthlyTarget, setMonthlyTarget] = useState(
-    initialData?.schedule?.targetCount || 10
-  );
 
   const resetForm = () => {
     setName('');
+    setColor(HABIT_COLORS[0]);
+    setRepeatOption('daily');
+    setTargetDays([1, 2, 3, 4, 5]);
+    setWeeklyTarget(3);
     setStackingCue('');
     setStackingAction('');
     setTwoMinuteAction('');
     setContextCue('');
     setCategory('productivity');
-    setCustomCategoryId('');
-    setScheduleType('daily');
-    setTargetDays([1, 2, 3, 4, 5]);
-    setMonthlyTarget(10);
+    setCustomizeOpen(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!name.trim()) return;
 
-    const schedule: HabitSchedule = {
-      type: scheduleType,
-      ...(scheduleType === 'weekly' && { targetDays }),
-      ...(scheduleType === 'monthly' && { targetCount: monthlyTarget }),
-    };
+    let schedule: HabitSchedule;
+    switch (repeatOption) {
+      case 'daily':
+        schedule = { type: 'daily' };
+        break;
+      case 'weekdays':
+        schedule = { type: 'weekly', targetDays: [1, 2, 3, 4, 5] };
+        break;
+      case 'weekends':
+        schedule = { type: 'weekly', targetDays: [0, 6] };
+        break;
+      case 'pick-days':
+        schedule = { type: 'weekly', targetDays };
+        break;
+      case 'x-per-week':
+        schedule = { type: 'monthly', targetCount: weeklyTarget * 4 };
+        break;
+      default:
+        schedule = { type: 'daily' };
+    }
 
     onSubmit({
       name: name.trim(),
@@ -90,8 +121,9 @@ export function HabitFormModal({
       twoMinuteAction: twoMinuteAction.trim() || undefined,
       contextCue: contextCue.trim() || undefined,
       category,
-      customCategoryName: category === 'custom' ? customCategoryId : undefined,
+      customCategoryName: undefined,
       schedule,
+      color,
     });
 
     resetForm();
@@ -104,6 +136,14 @@ export function HabitFormModal({
     );
   };
 
+  const repeatOptions: { value: RepeatOption; label: string }[] = [
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekdays', label: 'Weekdays' },
+    { value: 'weekends', label: 'Weekends' },
+    { value: 'pick-days', label: 'Pick days' },
+    { value: 'x-per-week', label: 'X per week' },
+  ];
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -114,183 +154,188 @@ export function HabitFormModal({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
-            {mode === 'create' ? 'Create New Habit' : 'Edit Habit'}
+            {mode === 'create' ? 'New Habit' : 'Edit Habit'}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-          {/* Basic Info */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Habit Name <span className="text-muted-foreground">*</span></Label>
+        <form onSubmit={handleSubmit} className="space-y-6 pt-2">
+          {/* Name Input with Icon */}
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 relative" style={{ backgroundColor: `${color}15` }}>
+              <CheckCircle2 className="w-6 h-6" style={{ color }} />
+              <Pencil className="w-3 h-3 absolute -bottom-0.5 -right-0.5 text-muted-foreground" />
+            </div>
             <Input
-              id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Read 10 pages"
+              placeholder="e.g. Exercise 30min, Read 10 pages..."
+              className="flex-1 border-border"
               required
             />
           </div>
 
-          {/* Habit Stacking */}
-          <div className="space-y-3 p-4 rounded-lg bg-secondary/50 border border-border">
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <Link2 className="w-4 h-4 text-primary" />
-              Habit Stacking
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Link this habit to an existing routine for better consistency
-            </p>
-            <div className="grid gap-3">
-              <div>
-                <Label htmlFor="stackingCue" className="text-xs">After I...</Label>
-                <Input
-                  id="stackingCue"
-                  value={stackingCue}
-                  onChange={(e) => setStackingCue(e.target.value)}
-                  placeholder="e.g., finish my morning coffee"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="stackingAction" className="text-xs">I will...</Label>
-                <Input
-                  id="stackingAction"
-                  value={stackingAction}
-                  onChange={(e) => setStackingAction(e.target.value)}
-                  placeholder="e.g., read for 10 minutes"
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          </div>
+          {/* Browse templates link */}
+          <button type="button" className="flex items-center gap-1.5 text-sm font-medium" style={{ color: HABIT_COLORS[0] }}>
+            <Sparkles className="w-4 h-4" />
+            Browse templates
+          </button>
 
-          {/* 2-Minute Rule */}
-          <div className="space-y-2 p-4 rounded-lg bg-secondary/50 border border-border">
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <Clock className="w-4 h-4 text-primary" />
-              2-Minute Entry Action
-            </div>
-            <p className="text-xs text-muted-foreground">
-              What's the smallest version you can start with?
-            </p>
-            <Input
-              value={twoMinuteAction}
-              onChange={(e) => setTwoMinuteAction(e.target.value)}
-              placeholder="e.g., Open book and read 1 page"
-            />
-          </div>
-
-          {/* Context Cue */}
-          <div className="space-y-2 p-4 rounded-lg bg-secondary/50 border border-border">
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <MapPin className="w-4 h-4 text-primary" />
-              Context Cue
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Where and when will you perform this habit?
-            </p>
-            <Input
-              value={contextCue}
-              onChange={(e) => setContextCue(e.target.value)}
-              placeholder="e.g., In the living room after dinner"
-            />
-          </div>
-
-          {/* Category */}
-          <div className="space-y-2">
-            <Label>Habit Area <span className="text-muted-foreground">*</span></Label>
-            <Select value={category} onValueChange={(v) => setCategory(v as HabitCategory)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(PRESET_CATEGORIES).map(([key, { name }]) => (
-                  <SelectItem key={key} value={key}>
-                    {name}
-                  </SelectItem>
-                ))}
-                {customCategories.map((cat) => (
-                  <SelectItem key={cat.id} value="custom">
-                    {cat.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="custom">+ Custom Category</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            {category === 'custom' && (
-              <Input
-                value={customCategoryId}
-                onChange={(e) => setCustomCategoryId(e.target.value)}
-                placeholder="Enter custom category name"
-                className="mt-2"
-              />
-            )}
-          </div>
-
-          {/* Schedule */}
+          {/* Repeat Section */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              <Label>Schedule <span className="text-muted-foreground">*</span></Label>
+            <span className="text-sm text-muted-foreground font-medium">Repeat</span>
+            <div className="flex flex-wrap gap-2">
+              {repeatOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setRepeatOption(opt.value)}
+                  className={cn(
+                    'px-4 py-2 rounded-full text-sm font-medium transition-colors border',
+                    repeatOption === opt.value
+                      ? 'bg-foreground text-background border-foreground'
+                      : 'bg-transparent text-foreground border-border hover:bg-secondary'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-            
-            <Select value={scheduleType} onValueChange={(v) => setScheduleType(v as HabitSchedule['type'])}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Specific Days</SelectItem>
-                <SelectItem value="monthly">X Times per Month</SelectItem>
-              </SelectContent>
-            </Select>
 
-            {scheduleType === 'weekly' && (
-              <div className="flex flex-wrap gap-2 pt-2">
+            {/* Pick days detail */}
+            {repeatOption === 'pick-days' && (
+              <div className="flex flex-wrap gap-2 pt-1">
                 {DAYS_OF_WEEK.map((day, index) => (
                   <button
                     key={day}
                     type="button"
                     onClick={() => toggleDay(index)}
                     className={cn(
-                      'w-10 h-10 rounded-lg text-sm font-medium transition-colors',
+                      'w-10 h-10 rounded-full text-sm font-medium transition-colors',
                       targetDays.includes(index)
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'text-white'
                         : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                     )}
+                    style={targetDays.includes(index) ? { backgroundColor: color } : undefined}
                   >
-                    {day}
+                    {day.charAt(0)}
                   </button>
                 ))}
               </div>
             )}
 
-            {scheduleType === 'monthly' && (
-              <div className="flex items-center gap-3 pt-2">
+            {/* X per week detail */}
+            {repeatOption === 'x-per-week' && (
+              <div className="flex items-center gap-3 pt-1">
                 <Input
                   type="number"
                   min={1}
-                  max={31}
-                  value={monthlyTarget}
-                  onChange={(e) => setMonthlyTarget(parseInt(e.target.value) || 1)}
+                  max={7}
+                  value={weeklyTarget}
+                  onChange={(e) => setWeeklyTarget(parseInt(e.target.value) || 1)}
                   className="w-20"
                 />
-                <span className="text-sm text-muted-foreground">times per month</span>
+                <span className="text-sm text-muted-foreground">times per week</span>
               </div>
             )}
           </div>
 
-          {/* Submit */}
-          <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
+          {/* Color Picker */}
+          <div className="flex flex-wrap gap-2.5">
+            {HABIT_COLORS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setColor(c)}
+                className={cn(
+                  'w-8 h-8 rounded-full transition-all',
+                  color === c ? 'ring-2 ring-offset-2 ring-offset-background' : ''
+                )}
+                style={{ backgroundColor: c, ...(color === c ? { ringColor: c } : {}) }}
+              />
+            ))}
+          </div>
+
+          {/* Customize (Collapsible) */}
+          <Collapsible open={customizeOpen} onOpenChange={setCustomizeOpen}>
+            <CollapsibleTrigger className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <ChevronRight className={cn('w-4 h-4 transition-transform', customizeOpen && 'rotate-90')} />
+              Customize
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-4">
+              {/* Category */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Habit Area</Label>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(PRESET_CATEGORIES).map(([key, { name: catName, color: catColor }]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setCategory(key as HabitCategory)}
+                      className={cn(
+                        'px-3 py-1.5 rounded-full text-xs font-medium transition-colors border',
+                        category === key
+                          ? 'border-transparent text-white'
+                          : 'border-border text-muted-foreground hover:bg-secondary'
+                      )}
+                      style={category === key ? { backgroundColor: catColor } : undefined}
+                    >
+                      {catName}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Habit Stacking */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Habit Stacking</Label>
+                <Input
+                  value={stackingCue}
+                  onChange={(e) => setStackingCue(e.target.value)}
+                  placeholder="After I..."
+                  className="text-sm"
+                />
+                <Input
+                  value={stackingAction}
+                  onChange={(e) => setStackingAction(e.target.value)}
+                  placeholder="I will..."
+                  className="text-sm"
+                />
+              </div>
+
+              {/* 2-Minute Action */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">2-Minute Entry Action</Label>
+                <Input
+                  value={twoMinuteAction}
+                  onChange={(e) => setTwoMinuteAction(e.target.value)}
+                  placeholder="Smallest version to start with..."
+                  className="text-sm"
+                />
+              </div>
+
+              {/* Context Cue */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Context Cue</Label>
+                <Input
+                  value={contextCue}
+                  onChange={(e) => setContextCue(e.target.value)}
+                  placeholder="Where and when..."
+                  className="text-sm"
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Divider + Actions */}
+          <div className="border-t border-border pt-4 flex justify-end gap-3">
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" className="flex-1">
-              {mode === 'create' ? 'Create Habit' : 'Save Changes'}
+            <Button type="submit" disabled={!name.trim()} className="px-6">
+              {mode === 'create' ? 'Create' : 'Save'}
             </Button>
           </div>
         </form>
