@@ -171,7 +171,7 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="hero" className="gap-2">
+        <Button variant="hero" className="gap-2 text-black">
           <Plus className="w-5 h-5" />
           Add Habit
         </Button>
