@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/hooks/useAuth";
 import TrackerLayout from "./layouts/TrackerLayout";
 import HabitDashboard from "./pages/HabitDashboard";
 import Monthly from "./pages/Monthly";
@@ -11,7 +12,6 @@ import Weekly from "./pages/Weekly";
 import ProgressPage from "./pages/ProgressPage";
 import EnhancedSettingsPage from "./pages/EnhancedSettingsPage";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
 
 const App = () => (
