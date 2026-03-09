@@ -151,8 +151,8 @@ export default function HabitDashboard() {
                 </Button>
               }
             />
-            <Button size="lg" className="gap-2 w-full bg-premium hover:bg-premium/90 text-premium-foreground shadow-md hover:shadow-lg">
-              <Plus className="w-5 h-5" />
+            <Button size="lg" className="gap-2 w-full bg-premium hover:bg-premium/90 text-black shadow-md hover:shadow-lg">
+              <Plus className="w-5 h-5 text-black" />
               Add Task
             </Button>
           </div>
