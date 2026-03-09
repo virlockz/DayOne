@@ -147,7 +147,7 @@ export default function HabitDashboard() {
               trigger={
                 <Button size="lg" className="gap-2 w-full">
                   <Plus className="w-5 h-5" />
-                  Add habit
+                  Add Habit
                 </Button>
               }
             />
