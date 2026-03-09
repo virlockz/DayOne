@@ -148,7 +148,7 @@ export function HabitFormModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="gap-2">
+          <Button className="gap-2 text-black">
             <Plus className="w-4 h-4" />
             Add Habit
           </Button>

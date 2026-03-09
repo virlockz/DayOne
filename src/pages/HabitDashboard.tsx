@@ -145,7 +145,7 @@ export default function HabitDashboard() {
               onSubmit={addHabit}
               customCategories={customCategories}
               trigger={
-                <Button size="lg" className="gap-2 w-full">
+                <Button size="lg" className="gap-2 w-full text-black">
                   <Plus className="w-5 h-5" />
                   Add Habit
                 </Button>
