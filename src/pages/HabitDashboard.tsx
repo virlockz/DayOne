@@ -3,14 +3,12 @@ import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEnhancedHabits } from '@/hooks/useEnhancedHabits';
-import { useXP } from '@/hooks/useXP';
 import { HabitFormModal } from '@/components/habits/HabitFormModal';
 import { CategorySection } from '@/components/habits/CategorySection';
 import { StreakChain } from '@/components/habits/StreakChain';
 import { JournalSection } from '@/components/habits/JournalSection';
 import { AutomaticityScorecard } from '@/components/habits/AutomaticityScorecard';
 import { MilestoneToast } from '@/components/habits/MilestoneToast';
-import { XPDisplay } from '@/components/gamification/XPDisplay';
 import { HabitCategory, PRESET_CATEGORIES, Habit } from '@/types/habits';
 import {
   AlertDialog,
@@ -41,8 +39,6 @@ export default function HabitDashboard() {
     getMilestones,
   } = useEnhancedHabits();
 
-  const { addHabitXP } = useXP();
-
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [deletingHabitId, setDeletingHabitId] = useState<string | null>(null);
   const [shownMilestones, setShownMilestones] = useState<Set<string>>(new Set());
@@ -61,15 +57,8 @@ export default function HabitDashboard() {
   );
 
   const handleToggleToday = useCallback(
-    (habitId: string) => {
-      const wasCompleted = isCompleted(habitId, today);
-      toggleLog(habitId, today);
-      // Award XP only when completing (not uncompleting)
-      if (!wasCompleted) {
-        addHabitXP();
-      }
-    },
-    [toggleLog, today, isCompleted, addHabitXP]
+    (habitId: string) => toggleLog(habitId, today),
+    [toggleLog, today]
   );
 
   const handleDeleteConfirm = () => {
@@ -192,7 +181,6 @@ export default function HabitDashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <XPDisplay />
             <StreakChain habits={habitsWithStats} />
             <JournalSection
               date={today}
