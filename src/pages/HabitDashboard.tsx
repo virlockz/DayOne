@@ -41,6 +41,8 @@ export default function HabitDashboard() {
     getMilestones,
   } = useEnhancedHabits();
 
+  const { addHabitXP } = useXP();
+
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [deletingHabitId, setDeletingHabitId] = useState<string | null>(null);
   const [shownMilestones, setShownMilestones] = useState<Set<string>>(new Set());
