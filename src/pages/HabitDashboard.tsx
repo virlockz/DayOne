@@ -140,20 +140,22 @@ export default function HabitDashboard() {
             Create your first habit using the habit stacking method. 
             Link it to something you already do to build powerful routines.
           </p>
-          <HabitFormModal
-            onSubmit={addHabit}
-            customCategories={customCategories}
-            trigger={
-              <Button size="lg" className="gap-2">
-                <Plus className="w-5 h-5" />
-                Create First Habit
-              </Button>
-            }
-          />
-          <Button size="lg" className="gap-2 bg-premium hover:bg-premium/90 text-premium-foreground shadow-md hover:shadow-lg">
-            <Plus className="w-5 h-5" />
-            Add Task
-          </Button>
+          <div className="flex flex-col gap-3">
+            <HabitFormModal
+              onSubmit={addHabit}
+              customCategories={customCategories}
+              trigger={
+                <Button size="lg" className="gap-2 w-full">
+                  <Plus className="w-5 h-5" />
+                  Create First Habit
+                </Button>
+              }
+            />
+            <Button size="lg" className="gap-2 w-full bg-premium hover:bg-premium/90 text-premium-foreground shadow-md hover:shadow-lg">
+              <Plus className="w-5 h-5" />
+              Add Task
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid lg:grid-cols-3 gap-6">
