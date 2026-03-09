@@ -3,12 +3,14 @@ import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEnhancedHabits } from '@/hooks/useEnhancedHabits';
+import { useXP } from '@/hooks/useXP';
 import { HabitFormModal } from '@/components/habits/HabitFormModal';
 import { CategorySection } from '@/components/habits/CategorySection';
 import { StreakChain } from '@/components/habits/StreakChain';
 import { JournalSection } from '@/components/habits/JournalSection';
 import { AutomaticityScorecard } from '@/components/habits/AutomaticityScorecard';
 import { MilestoneToast } from '@/components/habits/MilestoneToast';
+import { XPDisplay } from '@/components/gamification/XPDisplay';
 import { HabitCategory, PRESET_CATEGORIES, Habit } from '@/types/habits';
 import {
   AlertDialog,
