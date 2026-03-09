@@ -150,6 +150,10 @@ export default function HabitDashboard() {
               </Button>
             }
           />
+          <Button size="lg" className="gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg">
+            <Plus className="w-5 h-5" />
+            Add Task
+          </Button>
         </div>
       ) : (
         <div className="grid lg:grid-cols-3 gap-6">
