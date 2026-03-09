@@ -192,6 +192,7 @@ export default function HabitDashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            <XPDisplay />
             <StreakChain habits={habitsWithStats} />
             <JournalSection
               date={today}
