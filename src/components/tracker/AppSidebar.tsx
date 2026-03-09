@@ -17,8 +17,8 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Monthly', url: '/monthly', icon: Calendar },
-  { title: 'Weekly', url: '/weekly', icon: CalendarDays },
+  { title: 'Habits', url: '/monthly', icon: Calendar },
+  { title: 'Tasks', url: '/weekly', icon: CalendarDays },
   { title: 'Progress', url: '/progress', icon: TrendingUp },
   { title: 'Settings', url: '/settings', icon: Settings },
 ];
