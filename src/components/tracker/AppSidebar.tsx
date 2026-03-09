@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { XPDisplay } from '@/components/gamification/XPDisplay';
 
 const navItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
@@ -82,7 +83,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-2 border-t border-border">
+      <SidebarFooter className="p-2 border-t border-border space-y-2">
+        {!collapsed && <XPDisplay compact className="mx-1" />}
         <ThemeToggle collapsed={collapsed} />
       </SidebarFooter>
     </Sidebar>
