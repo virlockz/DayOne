@@ -16,25 +16,27 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light" storageKey="habit-tracker-theme">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route element={<TrackerLayout />}>
-              <Route path="/dashboard" element={<HabitDashboard />} />
-              <Route path="/monthly" element={<Monthly />} />
-              <Route path="/weekly" element={<Weekly />} />
-              <Route path="/progress" element={<ProgressPage />} />
-              <Route path="/settings" element={<EnhancedSettingsPage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider defaultTheme="light" storageKey="habit-tracker-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route element={<TrackerLayout />}>
+                <Route path="/dashboard" element={<HabitDashboard />} />
+                <Route path="/monthly" element={<Monthly />} />
+                <Route path="/weekly" element={<Weekly />} />
+                <Route path="/progress" element={<ProgressPage />} />
+                <Route path="/settings" element={<EnhancedSettingsPage />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
