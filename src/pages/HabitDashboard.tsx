@@ -61,8 +61,15 @@ export default function HabitDashboard() {
   );
 
   const handleToggleToday = useCallback(
-    (habitId: string) => toggleLog(habitId, today),
-    [toggleLog, today]
+    (habitId: string) => {
+      const wasCompleted = isCompleted(habitId, today);
+      toggleLog(habitId, today);
+      // Award XP only when completing (not uncompleting)
+      if (!wasCompleted) {
+        addHabitXP();
+      }
+    },
+    [toggleLog, today, isCompleted, addHabitXP]
   );
 
   const handleDeleteConfirm = () => {
