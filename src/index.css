@@ -48,6 +48,9 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
+    --premium: 25 95% 53%;
+    --premium-foreground: 0 0% 100%;
+
     /* Habit colors palette */
     --habit-teal: 175 84% 32%;
     --habit-coral: 12 76% 61%;
